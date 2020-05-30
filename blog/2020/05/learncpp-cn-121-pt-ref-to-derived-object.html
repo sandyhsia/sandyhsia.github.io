@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zn">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="sandyhsia">
+
+
+
+    <meta name="description" content="Code & Eat">
+
+
+
+<title>12.1 - 指向派生对象的基类的指针和引用 | Sober 0.1</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Sober 0.1</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Sober 0.1</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">12.1 - 指向派生对象的基类的指针和引用</h1>
+            
+                <div class="post-meta">
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">May 30, 2020&nbsp;&nbsp;17:39:35</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/learncpp-cn/">learncpp-cn</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <p>在前一章中，您学习了如何使用继承从现有类派生新类的所有知识。在本章中，我们将重点讨论继承最重要和最强大的方面之一——虚函数。</p>
+<p>但是在我们讨论什么是虚函数之前，让我们先来设置为什么需要它们。</p>
+<p>在构建派生类的章节中，您了解了在创建派生类时，它由多个部分组成: 每个继承的类都有一个部分，它本身也有一个部分。</p>
+<p>以下是一个简单的例子:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string_view&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="keyword">int</span> m_value;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Base(<span class="keyword">int</span> value)</span><br><span class="line">        : m_value&#123; value &#125;</span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="built_in">std</span>::string_view <span class="title">getName</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> <span class="string">"Base"</span>; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">getValue</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> m_value; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Derived</span>:</span> <span class="keyword">public</span> Base</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Derived(<span class="keyword">int</span> value)</span><br><span class="line">        : Base&#123; value &#125;</span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="built_in">std</span>::string_view <span class="title">getName</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> <span class="string">"Derived"</span>; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">getValueDoubled</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> m_value * <span class="number">2</span>; &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>当我们创建一个派生对象时，它包含一个基本部分 (首先构造的) 和一个派生部分 (其次构造的) 。请记住，继承意味着两个类之间存在一个<code>is-a</code>关系。因为派生的<code>是一个</code>基，所以派生的包含基部分是合适的。</p>
+<h2 id="事情的起因"><a href="#事情的起因" class="headerlink" title="事情的起因"></a>事情的起因</h2><h3 id="指针，引用，和派生类"><a href="#指针，引用，和派生类" class="headerlink" title="指针，引用，和派生类"></a>指针，引用，和派生类</h3><p>我们可以设置派生指针和引用的派生对象，这应该是相当直观的:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Derived derived&#123; <span class="number">5</span> &#125;;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"derived is a "</span> &lt;&lt; derived.getName() &lt;&lt; <span class="string">" and has value "</span> &lt;&lt; derived.getValue() &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line"> </span><br><span class="line">    Derived &amp;rDerived&#123; derived &#125;;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"rDerived is a "</span> &lt;&lt; rDerived.getName() &lt;&lt; <span class="string">" and has value "</span> &lt;&lt; rDerived.getValue() &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line"> </span><br><span class="line">    Derived *pDerived&#123; &amp;derived &#125;;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"pDerived is a "</span> &lt;&lt; pDerived-&gt;getName() &lt;&lt; <span class="string">" and has value "</span> &lt;&lt; pDerived-&gt;getValue() &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出结果是：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">derived is a Derived and has value 5</span><br><span class="line">rDerived is a Derived and has value 5</span><br><span class="line">pDerived is a Derived and has value 5</span><br></pre></td></tr></table></figure>
+
+<p>然而，由于Derived有一个基部分，一个更有趣的问题是c++是否会让我们设置一个基指针或引用到一个派生的对象。事实证明，我们可以!</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Derived derived&#123; <span class="number">5</span> &#125;;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// These are both legal!</span></span><br><span class="line">    Base &amp;rBase&#123; derived &#125;;</span><br><span class="line">    Base *pBase&#123; &amp;derived &#125;;</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"derived is a "</span> &lt;&lt; derived.getName() &lt;&lt; <span class="string">" and has value "</span> &lt;&lt; derived.getValue() &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"rBase is a "</span> &lt;&lt; rBase.getName() &lt;&lt; <span class="string">" and has value "</span> &lt;&lt; rBase.getValue() &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"pBase is a "</span> &lt;&lt; pBase-&gt;getName() &lt;&lt; <span class="string">" and has value "</span> &lt;&lt; pBase-&gt;getValue() &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出结果：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">derived is a Derived and has value 5</span><br><span class="line">rBase is a Base and has value 5</span><br><span class="line">pBase is a Base and has value 5</span><br></pre></td></tr></table></figure>
+<p>这个结果应该不是你想要的。</p>
+<p>因为rBase和pBase是一个基引用和指针，所以它们只能看到基的成员(或者基继承的任何类)。因此，即使派生::getName()的阴影(隐藏)基::getName()的派生对象，基指针/引用不能看到Derived::getName()。因此，它们调用Base::getName()，这就是为什么rBase和pBase报告说它们是基而不是派生的。</p>
+<p>注意，这也意味着不可能使用rBase或pBase调用Derived::getValueDoubled()。他们看不到任何衍生的东西。</p>
+<p>下面是另一个稍微复杂一点的例子，我们将在下节课中继续学习:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string_view&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Animal</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">string</span> m_name;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// We're making this constructor protected because</span></span><br><span class="line">    <span class="comment">// we don't want people creating Animal objects directly,</span></span><br><span class="line">    <span class="comment">// but we still want derived classes to be able to use it.</span></span><br><span class="line">    Animal(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span> &amp;name)</span><br><span class="line">        : m_name&#123; name &#125;</span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; <span class="title">getName</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> m_name; &#125;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::string_view <span class="title">speak</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> <span class="string">"???"</span>; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Cat</span>:</span> <span class="keyword">public</span> Animal</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Cat(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span> &amp;name)</span><br><span class="line">        : Animal&#123; name &#125;</span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="built_in">std</span>::string_view <span class="title">speak</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> <span class="string">"Meow"</span>; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dog</span>:</span> <span class="keyword">public</span> Animal</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Dog(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span> &amp;name)</span><br><span class="line">        : Animal&#123; name &#125;</span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="built_in">std</span>::string_view <span class="title">speak</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> <span class="string">"Woof"</span>; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Cat cat&#123; <span class="string">"Fred"</span> &#125;;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"cat is named "</span> &lt;&lt; cat.getName() &lt;&lt; <span class="string">", and it says "</span> &lt;&lt; cat.speak() &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line"> </span><br><span class="line">    Dog dog&#123; <span class="string">"Garbo"</span> &#125;;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"dog is named "</span> &lt;&lt; dog.getName() &lt;&lt; <span class="string">", and it says "</span> &lt;&lt; dog.speak() &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line"> </span><br><span class="line">    Animal *pAnimal&#123; &amp;cat &#125;;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"pAnimal is named "</span> &lt;&lt; pAnimal-&gt;getName() &lt;&lt; <span class="string">", and it says "</span> &lt;&lt; pAnimal-&gt;speak() &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line"> </span><br><span class="line">    pAnimal = &amp;dog;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"pAnimal is named "</span> &lt;&lt; pAnimal-&gt;getName() &lt;&lt; <span class="string">", and it says "</span> &lt;&lt; pAnimal-&gt;speak() &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出结果：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cat is named Fred, and it says Meow</span><br><span class="line">dog is named Garbo, and it says Woof</span><br><span class="line">pAnimal is named Fred, and it says ???</span><br><span class="line">pAnimal is named Garbo, and it says ???</span><br></pre></td></tr></table></figure>
+<p>我们在这里看到了同样的问题。因为pAnimal是一个动物类的指针，所以它只能看到类的Animal部分。因此，pAnimal-&gt;speak()调用Animal::speak()，而不是Dog:: speak()或Cat::speak()函数。</p>
+<h3 id="为什么我们要使用指向基类的指针和引用"><a href="#为什么我们要使用指向基类的指针和引用" class="headerlink" title="为什么我们要使用指向基类的指针和引用"></a>为什么我们要使用指向基类的指针和引用</h3><p>首先，假设您想编写一个函数来打印动物的名字和声音。如果不使用指向基类的指针，就必须使用重载函数来编写它，如下所示:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">report</span><span class="params">(<span class="keyword">const</span> Cat &amp;cat)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; cat.getName() &lt;&lt; <span class="string">" says "</span> &lt;&lt; cat.speak() &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">report</span><span class="params">(<span class="keyword">const</span> Dog &amp;dog)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; dog.getName() &lt;&lt; <span class="string">" says "</span> &lt;&lt; dog.speak() &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这当然不难，但是想想如果我们有30种不同的动物而不是2种，会发生什么？你必须写30个几乎相同的函数! 另外，如果你添加了一种新的动物，你也必须为它写一个新的函数。而考虑到唯一真正的区别是参数的类型，重写所所有的函数真是一个巨大的时间浪费。</p>
+<p>然而，因为猫和狗是从动物衍生出来的，猫和狗有一个动物的部分。因此，我们应该能够这样做是有意义的:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">report</span><span class="params">(<span class="keyword">const</span> Animal &amp;rAnimal)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; rAnimal.getName() &lt;&lt; <span class="string">" says "</span> &lt;&lt; rAnimal.speak() &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>This would let us pass in any class derived from Animal, even ones that we created after we wrote the function! Instead of one function per derived class, we get one function that works with all classes derived from Animal!</p>
+<p>The problem is, of course, that because rAnimal is an Animal reference, rAnimal.speak() will call Animal::speak() instead of the derived version of speak().</p>
+<p>Second, let’s say you had 3 cats and 3 dogs that you wanted to keep in an array for easy access. Because arrays can only hold objects of one type, without a pointer or reference to a base class, you’d have to create a different array for each derived type, like this:<br>这将允许我们传入任何派生自Animal的类，甚至是我们在编写函数之后创建的类! <code>不是每个派生类都有一个函数，而是有一个函数可以处理所有从Animal派生的类</code>!</p>
+<p>当然，问题是，因为rAnimal是一个动物类的引用，所以rAnimal.speak()将调用Animal::speak()，而不是speak()的派生版本。</p>
+<p>其次，假设您有3只猫和3只狗，您希望将它们放在一个数组中，以便于访问。因为数组只能保存一种类型的对象，没有指针或对基类的引用，所以必须为每个派生类型创建不同的数组，如下所示:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Cat cats[]&#123; &#123; <span class="string">"Fred"</span> &#125;, &#123; <span class="string">"Misty"</span> &#125;, &#123; <span class="string">"Zeke"</span> &#125; &#125;;</span><br><span class="line">    Dog dogs[]&#123; &#123; <span class="string">"Garbo"</span> &#125;, &#123; <span class="string">"Pooky"</span> &#125;, &#123; <span class="string">"Truffle"</span> &#125; &#125;;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> &amp;cat : cats)</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; cat.getName() &lt;&lt; <span class="string">" says "</span> &lt;&lt; cat.speak() &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> &amp;dog : dogs)</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; dog.getName() &lt;&lt; <span class="string">" says "</span> &lt;&lt; dog.speak() &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>现在，考虑一下如果你有30种不同的动物会发生什么。你需要30个数组，每种动物一个! 然而，因为猫和狗都来自于动物，我们做这样的事情是有道理的:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Cat fred&#123; <span class="string">"Fred"</span> &#125;;</span><br><span class="line">    Cat misty&#123; <span class="string">"Misty"</span> &#125;;</span><br><span class="line">    Cat zeke&#123; <span class="string">"Zeke"</span> &#125;;</span><br><span class="line"> </span><br><span class="line">    Dog garbo&#123; <span class="string">"Garbo"</span> &#125;;</span><br><span class="line">    Dog pooky&#123; <span class="string">"Pooky"</span> &#125;;</span><br><span class="line">    Dog truffle&#123; <span class="string">"Truffle"</span> &#125;;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// Set up an array of pointers to animals, and set those pointers to our Cat and Dog objects</span></span><br><span class="line">    Animal *animals[]&#123; &amp;fred, &amp;garbo, &amp;misty, &amp;pooky, &amp;truffle, &amp;zeke &#125;;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> animal : animals)</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; animal-&gt;getName() &lt;&lt; <span class="string">" says "</span> &lt;&lt; animal-&gt;speak() &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在编译和执行时，不幸的是，数组“animals”的每个元素都是指向动物的指针，这意味着animals[3]-&gt;speak()将调用Animal::speak()，而不是我们想要的speak()的派生类版本。</p>
+<p>虽然这两种技术都可以节省我们大量的时间和精力，但它们都有相同的问题。指向基类的指针或引用调用函数的基版本，而不是派生版本。如果有什么方法可以让这些基指针调用函数的派生版本而不是基版本就好了……</p>
+<p>想猜猜虚函数是干什么的吗? :)</p>
+<h2 id="小测！Quiz-time"><a href="#小测！Quiz-time" class="headerlink" title="小测！Quiz time"></a>小测！Quiz time</h2><h3 id="1"><a href="#1" class="headerlink" title="(1)"></a>(1)</h3><p>上面的Animal/Cat/Dog示例并不像我们希望的那样工作，因为指向Animal类的引用或指针无法访问speak()的派生版本，而speak()需要为猫或狗返回正确的值。解决这个问题的一种方法是将speak()函数返回的数据作为动物基类的一部分进行访问(非常类似于通过成员m_name访问动物的名称)。</p>
+<p>通过向名为m_speak的动物添加一个新成员来更新上面课程中的动物、猫和狗类。适当的初始化它, 以便以下程序能正常工作:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Cat fred&#123; <span class="string">"Fred"</span> &#125;;</span><br><span class="line">    Cat misty&#123; <span class="string">"Misty"</span> &#125;;</span><br><span class="line">    Cat zeke&#123; <span class="string">"Zeke"</span> &#125;;</span><br><span class="line"> </span><br><span class="line">    Dog garbo&#123; <span class="string">"Garbo"</span> &#125;;</span><br><span class="line">    Dog pooky&#123; <span class="string">"Pooky"</span> &#125;;</span><br><span class="line">    Dog truffle&#123; <span class="string">"Truffle"</span> &#125;;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// Set up an array of pointers to animals, and set those pointers to our Cat and Dog objects</span></span><br><span class="line">    Animal *animals[]&#123; &amp;fred, &amp;garbo, &amp;misty, &amp;pooky, &amp;truffle, &amp;zeke &#125;;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> animal : animals)</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; animal-&gt;getName() &lt;&lt; <span class="string">" says "</span> &lt;&lt; animal-&gt;speak() &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>答案：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Animal</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">string</span> m_name;</span><br><span class="line">    <span class="built_in">std</span>::string_view m_speak;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// We're making this constructor protected because</span></span><br><span class="line">    <span class="comment">// we don't want people creating Animal objects directly,</span></span><br><span class="line">    <span class="comment">// but we still want derived classes to be able to use it.</span></span><br><span class="line">    Animal(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span> &amp;name, <span class="built_in">std</span>::string_view speak)</span><br><span class="line">        : m_name&#123; name &#125;, m_speak&#123; speak &#125;</span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    Animal(<span class="keyword">const</span> Animal&amp;) = <span class="keyword">delete</span>; <span class="comment">// to prevent shallow copies</span></span><br><span class="line">    Animal&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Animal&amp;) = <span class="keyword">delete</span>; <span class="comment">// to prevent shallow copies</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; <span class="title">getName</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> m_name; &#125;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::string_view <span class="title">speak</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> m_speak; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Cat</span>:</span> <span class="keyword">public</span> Animal</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Cat(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span> &amp;name)</span><br><span class="line">        : Animal&#123; name, <span class="string">"Meow"</span> &#125;</span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dog</span>:</span> <span class="keyword">public</span> Animal</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Dog(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span> &amp;name)</span><br><span class="line">        : Animal&#123; name, <span class="string">"Woof"</span> &#125;</span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Cat fred&#123; <span class="string">"Fred"</span> &#125;;</span><br><span class="line">    Cat misty&#123; <span class="string">"Misty"</span> &#125;;</span><br><span class="line">    Cat zeke&#123; <span class="string">"Zeke"</span> &#125;;</span><br><span class="line"> </span><br><span class="line">    Dog garbo&#123; <span class="string">"Garbo"</span> &#125;;</span><br><span class="line">    Dog pooky&#123; <span class="string">"Pooky"</span> &#125;;</span><br><span class="line">    Dog truffle&#123; <span class="string">"Truffle"</span> &#125;;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// Set up an array of pointers to animals, and set those pointers to our Cat and Dog objects</span></span><br><span class="line">    Animal *animals[]&#123; &amp;fred, &amp;garbo, &amp;misty, &amp;pooky, &amp;truffle, &amp;zeke &#125;;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> animal : animals)</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; animal-&gt;getName() &lt;&lt; <span class="string">" says "</span> &lt;&lt; animal-&gt;speak() &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意: 还可以将m_speak设置为std::string，但是这样做的缺点是每个动物都包含一个多余的“speak”字符串副本，而且animals数组的构造将花费更长的时间，因为创建std::string的深层拷贝比复制std::string_view要慢。</p>
+</blockquote>
+<h3 id="2"><a href="#2" class="headerlink" title="(2)"></a>(2)</h3><p>思考一个问题：为什么上述的解决方案并不好？</p>
+<p>提示: 考虑一下猫和狗的未来状态，我们想在更多方面区分猫和狗。<br>提示: 考虑需要在初始化时设置成员的方式对您的限制。</p>
+<p>答案：</p>
+<blockquote>
+<p>当前的解决方案不是最优的<br>(1) 因为我们需要为每种区分Cat和Dog的方法添加一个成员。随着时间的推移，我们的动物类可能会变得非常庞大，而且复杂!<br>(2) 只有在初始化时可以确定基类成员时，此解决方案才有效。例如，如果speak()为每个动物返回一个随机结果 (例如:calling Dog::speak()可以返回“woof”、“arf”或“yip”)，这种解决方案就会开始变得笨拙并崩溃。</p>
+</blockquote>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>sandyhsia</span>
+                    </p>
+                
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/cpp/"># cpp</a>
+                    
+                        <a href="/tags/virtual-function/"># virtual function</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/blog/2020/05/learncpp-cn-122-virtual-function.html">12.2 - 虚函数和多态</a>
+            
+            
+            <a class="next" rel="next" href="/blog/2020/05/2020-05-27-markdown-test.html">Markdown TEST</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© sandyhsia | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

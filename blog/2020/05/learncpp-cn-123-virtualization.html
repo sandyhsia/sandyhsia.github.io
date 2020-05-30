@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zn">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="sandyhsia">
+
+
+
+    <meta name="description" content="Code & Eat">
+
+
+
+<title>12.3 - 虚的析构函数、虚的赋值和虚的覆盖 | Sober 0.1</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Sober 0.1</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Sober 0.1</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">12.3 - 虚的析构函数、虚的赋值和虚的覆盖</h1>
+            
+                <div class="post-meta">
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">May 30, 2020&nbsp;&nbsp;18:21:53</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/learncpp-cn/">learncpp-cn</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h2 id="虚的析构函数、虚的赋值和虚的覆盖"><a href="#虚的析构函数、虚的赋值和虚的覆盖" class="headerlink" title="虚的析构函数、虚的赋值和虚的覆盖"></a>虚的析构函数、虚的赋值和虚的覆盖</h2><h3 id="虚的析构函数（Virtual-destructors）"><a href="#虚的析构函数（Virtual-destructors）" class="headerlink" title="虚的析构函数（Virtual destructors）"></a>虚的析构函数（Virtual destructors）</h3><p>尽管c++为您的类提供了一个默认的析构函数(如果您自己不提供的话)，但有时您会希望提供自己的析构函数 (特别是当类需要释放内存时) 。如果要处理继承，应该始终将析构函数设为虚。考虑下面的例子:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ~Base() <span class="comment">// note: not virtual</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"Calling ~Base()\n"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Derived</span>:</span> <span class="keyword">public</span> Base</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">int</span>* m_array;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Derived(<span class="keyword">int</span> length)</span><br><span class="line">    &#123;</span><br><span class="line">        m_array = <span class="keyword">new</span> <span class="keyword">int</span>[length];</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    ~Derived() <span class="comment">// note: not virtual (your compiler may warn you about this)</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"Calling ~Derived()\n"</span>;</span><br><span class="line">        <span class="keyword">delete</span>[] m_array;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Derived *derived &#123; <span class="keyword">new</span> Derived(<span class="number">5</span>) &#125;;</span><br><span class="line">    Base *base &#123; derived &#125;;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">delete</span> base;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意:如果您编译上面的例子，您的编译器可能会警告您有关非虚拟析构函数 (在本例中是故意这样做的) 。您可能需要禁用将警告作为错误处理的编译器标识 (compiler flag)。</p>
+<p>因为base是一个基指针，所以在删除base时，程序会查看基析构函数是否是虚的。它不是，所以编译器假设它只需要调用基类的析构函数。我们可以从上面的例子的输出中看出这一点:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">Calling ~Base()</span><br><span class="line">``</span><br><span class="line"></span><br><span class="line">但是，我们确实希望delete函数调用派生的析构函数(它将依次调用Base的析构函数)，否则m_array将不会被删除。我们通过使基的析构函数为虚来做这件事情:</span><br><span class="line"></span><br><span class="line">```cpp</span><br><span class="line"><span class="meta">#</span><span class="bash">include &lt;iostream&gt;</span></span><br><span class="line">class Base</span><br><span class="line">&#123;</span><br><span class="line">public:</span><br><span class="line">    virtual ~Base() // note: virtual</span><br><span class="line">    &#123;</span><br><span class="line">        std::cout &lt;&lt; "Calling ~Base()\n";</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line">class Derived: public Base</span><br><span class="line">&#123;</span><br><span class="line">private:</span><br><span class="line">    int* m_array;</span><br><span class="line"> </span><br><span class="line">public:</span><br><span class="line">    Derived(int length)</span><br><span class="line">    &#123;</span><br><span class="line">        m_array = new int[length];</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    virtual ~Derived() // note: virtual</span><br><span class="line">    &#123;</span><br><span class="line">        std::cout &lt;&lt; "Calling ~Derived()\n";</span><br><span class="line">        delete[] m_array;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">    Derived *derived &#123; new Derived(5) &#125;;</span><br><span class="line">    Base *base &#123; derived &#125;;</span><br><span class="line"> </span><br><span class="line">    delete base;</span><br><span class="line"> </span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出结果如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Calling ~Derived()</span><br><span class="line">Calling ~Base()</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>规则: 无论何时处理继承，都应该使任何显式析构函数成为虚函数（ Whenever you are dealing with inheritance, you should make any explicit destructors virtual.）</p>
+</blockquote>
+<p>规则: 无论何时处理继承，都应该使任何显式析构函数成为虚函数。</p>
+<p>与普通的虚成员函数一样，如果基类函数是虚的，则所有派生重写都将被视为虚的，而不管它们是否被指定为虚的。没有必要创建一个空的派生类析构函数来将它标记为虚的。</p>
+<h3 id="虚的赋值-Virtual-assignment"><a href="#虚的赋值-Virtual-assignment" class="headerlink" title="虚的赋值 (Virtual assignment)"></a>虚的赋值 (Virtual assignment)</h3><p>可以使赋值运算符为虚。然而，与析构函数的情况不同，虚拟化析构函数总是一个好主意，但虚拟化赋值操作符实际上打开了一个充满蠕虫的包，并进入了本教程范围之外的一些更高级的主题。因此，为了简单起见，我们建议您暂时不要使用虚的赋值。</p>
+<h3 id="忽略掉虚化（Ignoring-virtualization）"><a href="#忽略掉虚化（Ignoring-virtualization）" class="headerlink" title="忽略掉虚化（Ignoring virtualization）"></a>忽略掉虚化（Ignoring virtualization）</h3><p>我们很少会想要忽略掉函数的虚化。例如，考虑以下代码:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">const</span> <span class="keyword">char</span>* <span class="title">getName</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> <span class="string">"Base"</span>; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Derived</span>:</span> <span class="keyword">public</span> Base</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">const</span> <span class="keyword">char</span>* <span class="title">getName</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> <span class="string">"Derived"</span>; &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>在某些情况下，您可能需要一个指向派生对象的基指针来调用Base::getName()，<br>而不是派生::getName()。要做到这一点，只需使用范围解析操作符:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Derived derived;</span><br><span class="line">    Base &amp;base &#123; derived &#125;;</span><br><span class="line">    <span class="comment">// Calls Base::GetName() instead of the virtualized Derived::GetName()</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; base.Base::getName() &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>你可能不会经常用到它，但知道它是可能的也许是件好事。</p>
+<h3 id="我们应该让所有析构函数都是虚的吗"><a href="#我们应该让所有析构函数都是虚的吗" class="headerlink" title="我们应该让所有析构函数都是虚的吗?"></a>我们应该让所有析构函数都是虚的吗?</h3><p>这是新程序员常问的问题。如上例所述，如果基类析构函数没有标记为虚函数，那么如果程序员稍后删除指向派生对象的基类指针，程序就有内存泄漏的风险。避免这种情况的一种方法是将所有析构函数标记为虚函数。但是你应该吗? </p>
+<p>说是很容易，这样您以后就可以将任何类用作基类——但是这样做会带来性能损失(向您的类的每个实例添加一个虚指针)。所以你必须平衡成本和你的意图。</p>
+<p>传统观点 (最初由备受推崇的c++大师Herb Sutter提出) 建议避免非虚拟析构函数内存泄漏的情况如下:“基类析构函数应该是以下中的一种，公有并虚拟的，或者是受保护并非虚拟的。”</p>
+<blockquote>
+<p>“A base class destructor should be either public and virtual, or protected and nonvirtual.” </p>
+</blockquote>
+<p>具有受保护析构函数的类不能通过指针进行删除，从而防止在基类具有非虚析构函数时，通过基指针意外删除派生类。不幸的是，这也意味着基类不能通过基类指针删除，这本质上意味着除了派生类之外，该类不能被动态分配或删除。这也排除了对这样的类使用智能指针 (例如std::unique_ptr和std::shared_ptr)，这限制了该规则的有益之处 (我们将在后面的章节中讨论智能指针) 。这也意味着基类不能在堆栈上分配。这真是一堆令人难受的惩罚。</p>
+<p>现在，最终说明符 (final sepcifier) 已经引入到这门语言中，我们的建议如下:</p>
+<ul>
+<li>如果要从类继承，请确保析构函数是虚的。</li>
+<li>如果您不打算从您的类继承，请将您的类标记为final。这将首先防止其他类继承它，而不会对类本身施加任何其他使用上的限制。</li>
+</ul>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>sandyhsia</span>
+                    </p>
+                
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/cpp/"># cpp</a>
+                    
+                        <a href="/tags/virtual-function/"># virtual function</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/blog/2020/05/learncpp-cn-126-pure-virtual.html">12.6 - 纯虚函数、抽象基类和接口类</a>
+            
+            
+            <a class="next" rel="next" href="/blog/2020/05/learncpp-cn-122-virtual-function.html">12.2 - 虚函数和多态</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© sandyhsia | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

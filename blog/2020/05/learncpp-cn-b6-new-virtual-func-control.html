@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zn">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="sandyhsia">
+
+
+
+    <meta name="description" content="Code & Eat">
+
+
+
+<title>B.6 - 新的虚函数控制：override, final, default, delete | Sober 0.1</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Sober 0.1</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Sober 0.1</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">B.6 - 新的虚函数控制：override, final, default, delete</h1>
+            
+                <div class="post-meta">
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">May 30, 2020&nbsp;&nbsp;21:37:15</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/learncpp-cn/">learncpp-cn</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h3 id="标识符-override"><a href="#标识符-override" class="headerlink" title="标识符 override"></a>标识符 override</h3><p>当使用派生类时，当您实际上打算重写基类中的函数时，很容易在派生类中无意中创建一个新的虚函数。当您无法正确匹配派生类中的函数原型与基类中的函数原型时，就会发生这种情况。例如:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">A</span><span class="params">(<span class="keyword">float</span>=<span class="number">0.0</span>)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">B</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Derived</span>:</span> <span class="keyword">public</span> Base</span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">A</span><span class="params">(<span class="keyword">int</span>=<span class="number">0</span>)</span></span>; <span class="comment">// specifies parameter as int instead of float, treated as new function</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">B</span><span class="params">()</span></span>; <span class="comment">// specifies function as non-const, treated as new function</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>当发生这种情况时，可以很容易地对A()或B()进行函数调用，并期望得到派生版本，但最终得到的却是基本版本。</p>
+<p>当您在Base中向函数添加新参数而忘记更新派生函数的版本时，也很容易出现这种现象。当这种情况发生时，派生中的重写函数不再是重写函数，您的代码将<code>神秘地停止工作 :-)</code>。 这些类型的问题很难发现，因为引发这些问题的变化看起来非常无害。</p>
+<p>c++ 11引入了一个名为override的新标识符，允许显式标记要重写的函数。如果函数不是覆盖的，编译器就会报错。例如:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">A</span><span class="params">(<span class="keyword">float</span>=<span class="number">0.0</span>)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">B</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">C</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">D</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Derived</span>:</span> <span class="keyword">public</span> Base</span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">A</span><span class="params">(<span class="keyword">int</span>=<span class="number">0</span>)</span> <span class="keyword">override</span></span>; <span class="comment">// compile error because Derived::A(int) does not override Base::A(float)</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">B</span><span class="params">()</span> <span class="keyword">override</span></span>; <span class="comment">// compile error because Derived::B() does not override Base::B() const</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">C</span><span class="params">()</span> <span class="keyword">override</span></span>; <span class="comment">// ok!  Derived::C() overrides Base::C()</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">D</span><span class="params">()</span> <span class="keyword">override</span></span>; <span class="comment">// compile error because Derived::D() does not override Base::D() (because Base::D() is not virtual)</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>虽然不强制需要使用覆盖 (override) 标识符，但我们强烈建议您使用它，因为它有助于防止意外错误。</p>
+<p>(如果您想知道为什么这是作为标识符 (identifier) 而不是关键字 (keyword) 来实现的，我认为这样做是为了让名称“override”可以在其他上下文中用作普通的变量名。如果它被定义为关键字，那么它将在所有上下文中被保留，这可能会破坏现有的应用程序)</p>
+<h2 id="标识符-final"><a href="#标识符-final" class="headerlink" title="标识符 final"></a>标识符 final</h2><p>有时候，您不希望允许别人重写虚函数，甚至不希望创建派生类。c++ 11添加标识符final来提供此功能。</p>
+<p>下面的例子展示了如何使用final标识符使函数不可重写:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">A</span><span class="params">()</span> <span class="keyword">final</span></span>; <span class="comment">// final identifier marks this function as non-overrideable</span></span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Derived</span>:</span> <span class="keyword">public</span> Base</span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">A</span><span class="params">()</span></span>; <span class="comment">// trying to override final function Base::A() will cause a compiler error</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>final标识符也可以用在类上，使它们不可继承:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base</span> <span class="title">final</span> // <span class="title">final</span> <span class="title">identifier</span> <span class="title">marks</span> <span class="title">this</span> <span class="title">class</span> <span class="title">as</span> <span class="title">non</span>-<span class="title">inheritable</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Derived</span>:</span> <span class="keyword">public</span> Base <span class="comment">// trying to inherit from final class Base will cause a compiler error</span></span><br><span class="line">&#123;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>将函数或类设置为final有一些合理的原因。例如，final最常见的用法是确保一个不可变类保持不变。不可变类是一种特殊设计的类，其状态在创建后不能修改。如果没有最终标识符，派生类可能会添加导致类变易变的函数。如果基类为final，则不能将其子类化，这是避免的。</p>
+<p>但是，一般来说，除非你有很好的理由，否则一般应该避免使用final。如果您确实使用了final关键字，请记录原因，因为继承您的代码的人可能并不清楚这一点。</p>
+<h2 id="标识符-default"><a href="#标识符-default" class="headerlink" title="标识符 default"></a>标识符 default</h2><p>在默认情况下，c++将提供一个默认构造函数、复制构造函数、复制赋值操作符(操作符=)和一个析构函数。如果你为你的类提供这些函数的任何一个替代版本，c++将不会提供一个默认版本。但是，在c++ 11中，您现在可以指定希望编译器提供一个默认值。这是通过原型函数 (prototyping the function) 和使用default的说明符:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    Foo(<span class="keyword">int</span> x); <span class="comment">// Custom constructor</span></span><br><span class="line">    Foo() = <span class="keyword">default</span>; <span class="comment">// The compiler will now provide a default constructor for class Foo as well</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>default说明符只能用于具有默认值的函数。</p>
+<h2 id="标识符-delete"><a href="#标识符-delete" class="headerlink" title="标识符 delete"></a>标识符 delete</h2><p>比default说明符更有用的是delete说明符，它可用于禁止定义或调用函数。delete说明符的最佳用途之一是使类不可复制 (uncopyable) :</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    Foo&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Foo&amp;) = <span class="keyword">delete</span>; <span class="comment">// disallow use of assignment operator</span></span><br><span class="line">    Foo(<span class="keyword">const</span> Foo&amp;) = <span class="keyword">delete</span>; <span class="comment">// disallow copy construction</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>还可以使用delete说明符来确保不调用具有特定参数的成员函数。例如:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    Foo(<span class="keyword">long</span> <span class="keyword">long</span>); <span class="comment">// Can create Foo() with a long long</span></span><br><span class="line">    Foo(<span class="keyword">long</span>) = <span class="keyword">delete</span>; <span class="comment">// But can't create it with anything smaller</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>在上面的例子中，如果你尝试用char、short、int或long来调用Foo，这些都会被隐式地转换成long，然后匹配Foo(long)。由于Foo(long)已被删除，编译器将会出错。</p>
+<p>如果你想让你的类只被调用非常具体的数据类型，你可以通过使用一个模板函数来匹配所有没有被明确定义的参数类型，从而关闭所有的隐式转换:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    Foo(<span class="keyword">long</span> <span class="keyword">long</span>); <span class="comment">// Can create Foo() with a long long</span></span><br><span class="line">    <span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="title">Foo</span><span class="params">(T)</span> </span>= <span class="keyword">delete</span>; <span class="comment">// But can't create it with anything else</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>sandyhsia</span>
+                    </p>
+                
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/cpp/"># cpp</a>
+                    
+                        <a href="/tags/virtual-function/"># virtual function</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/blog/2020/05/learncpp-cn-126-pure-virtual.html">12.6 - 纯虚函数、抽象基类和接口类</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© sandyhsia | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

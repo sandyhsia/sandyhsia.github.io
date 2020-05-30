@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zn">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="sandyhsia">
+
+
+
+    <meta name="description" content="Code & Eat">
+
+
+
+<title>12.6 - 纯虚函数、抽象基类和接口类 | Sober 0.1</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Sober 0.1</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Sober 0.1</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">12.6 - 纯虚函数、抽象基类和接口类</h1>
+            
+                <div class="post-meta">
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">May 30, 2020&nbsp;&nbsp;21:02:03</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/learncpp-cn/">learncpp-cn</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h2 id="纯虚函数和抽象基类"><a href="#纯虚函数和抽象基类" class="headerlink" title="纯虚函数和抽象基类"></a>纯虚函数和抽象基类</h2><p>到目前为止，我们编写的所有虚函数都有一个主体 (定义) 。但是，c++允许您创建一种特殊的虚函数，称为纯虚函数(或抽象函数)，它完全没有实体! 一个纯虚函数只是作为一个占位符，它将被派生类重新定义。</p>
+<p>要创建一个纯虚函数，而不是为函数定义一个主体，我们只需将函数赋值为0。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">const</span> <span class="keyword">char</span>* <span class="title">sayHi</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> <span class="string">"Hi"</span>; &#125; <span class="comment">// a normal non-virtual function </span></span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">const</span> <span class="keyword">char</span>* <span class="title">getName</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> <span class="string">"Base"</span>; &#125; <span class="comment">// a normal virtual function</span></span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">int</span> <span class="title">getValue</span><span class="params">()</span> </span>= <span class="number">0</span>; <span class="comment">// a pure virtual function</span></span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">doSomething</span><span class="params">()</span> </span>= <span class="number">0</span>; <span class="comment">// Compile error: can not set non-virtual functions to 0</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>当我们向类添加一个纯虚函数时，我们实际上是在说，“实现这个函数取决于派生类”。</p>
+<p>使用纯虚函数有两个主要的结果:首先，任何带有一个或多个纯虚函数的类都变成了一个抽象基类，这意味着它不能被实例化!考虑一下如果我们可以创建一个Base实例会发生什么:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Base base; <span class="comment">// We can't instantiate an abstract base class, but for the sake of example, pretend this was allowed</span></span><br><span class="line">    base.getValue(); <span class="comment">// what would this do?</span></span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>因为没有getValue()的定义，那么base.getValue()解析成什么呢?</p>
+<p>其次，任何派生类都必须为这个函数定义一个主体，否则这个派生类也会被认为是一个抽象基类。</p>
+<h3 id="一个纯虚函数的例子"><a href="#一个纯虚函数的例子" class="headerlink" title="一个纯虚函数的例子"></a>一个纯虚函数的例子</h3><p>让我们看一个纯虚函数的例子。在前一课中，我们编写了一个简单的动物基类，并从中派生了一个Cat和一个Dog类。这是我们留下的代码:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string&gt;</span></span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Animal</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">string</span> m_name;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// We're making this constructor protected because</span></span><br><span class="line">    <span class="comment">// we don't want people creating Animal objects directly,</span></span><br><span class="line">    <span class="comment">// but we still want derived classes to be able to use it.</span></span><br><span class="line">    Animal(<span class="built_in">std</span>::<span class="built_in">string</span> name)</span><br><span class="line">        : m_name(name)</span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::<span class="built_in">string</span> <span class="title">getName</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> m_name; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">const</span> <span class="keyword">char</span>* <span class="title">speak</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> <span class="string">"???"</span>; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Cat</span>:</span> <span class="keyword">public</span> Animal</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Cat(<span class="built_in">std</span>::<span class="built_in">string</span> name)</span><br><span class="line">        : Animal(name)</span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">const</span> <span class="keyword">char</span>* <span class="title">speak</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> <span class="string">"Meow"</span>; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dog</span>:</span> <span class="keyword">public</span> Animal</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Dog(<span class="built_in">std</span>::<span class="built_in">string</span> name)</span><br><span class="line">        : Animal(name)</span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">const</span> <span class="keyword">char</span>* <span class="title">speak</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> <span class="string">"Woof"</span>; &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>我们通过使构造函数受保护来阻止人们分配Animal类型的对象。然而，这样做有两个问题:</p>
+<ul>
+<li>构造函数仍然可以从派生类中访问，这使得实例化一个动物对象成为可能。</li>
+<li>仍然可以创建不重新定义函数speak()的派生类。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Cow</span>:</span> <span class="keyword">public</span> Animal</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Cow(<span class="built_in">std</span>::<span class="built_in">string</span> name)</span><br><span class="line">        : Animal(name)</span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// 完，我们忘记了定义Cow类的speak :\</span></span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">Cow <span class="title">cow</span><span class="params">(<span class="string">"Betsy"</span>)</span></span>;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; cow.getName() &lt;&lt; <span class="string">" says "</span> &lt;&lt; cow.speak() &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出结果：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Betsy says ???</span><br></pre></td></tr></table></figure>
+
+<p>发生了什么事? 这是因为我们忘记了重新定义函数speak()，因此cow.Speak()解析为anim.speak()，这不是我们想要的。</p>
+<p>更好的解决方法是使用纯虚函数:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string&gt;</span></span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Animal</span> // <span class="title">This</span> <span class="title">Animal</span> <span class="title">is</span> <span class="title">an</span> <span class="title">abstract</span> <span class="title">base</span> <span class="title">class</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">string</span> m_name;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Animal(<span class="built_in">std</span>::<span class="built_in">string</span> name)</span><br><span class="line">        : m_name(name)</span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="built_in">std</span>::<span class="built_in">string</span> <span class="title">getName</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> m_name; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">const</span> <span class="keyword">char</span>* <span class="title">speak</span><span class="params">()</span> </span>= <span class="number">0</span>; <span class="comment">// note that speak is now a pure virtual function</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>这里有几点需要注意。首先，speak()现在是一个纯虚函数。这意味着Animal现在是一个抽象基类，不能被实例化。因此，我们不再需要使构造函数受保护更长时间(尽管它不会造成伤害)。其次，因为我们的Cow类派生自Animal，但是我们没有定义Cow::speak()， Cow也是一个抽象基类。现在，当我们试图编译这段代码:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Cow</span>:</span> <span class="keyword">public</span> Animal</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Cow(<span class="built_in">std</span>::<span class="built_in">string</span> name)</span><br><span class="line">        : Animal(name)</span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// We forgot to redefine speak</span></span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">Cow <span class="title">cow</span><span class="params">(<span class="string">"Betsy"</span>)</span></span>;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; cow.getName() &lt;&lt; <span class="string">" says "</span> &lt;&lt; cow.speak() &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编译器会给我们一个警告，因为Cow是一个抽象基类，我们不能创建抽象基类的实例:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">C:\Test.cpp(141):错误C2259: 'Cow':由于以下成员，无法实例化抽象类:</span><br><span class="line">C:Test.cpp(128):参见声明“Cow”</span><br><span class="line">C:\Test.cpp(141): warning C4259: 'const char * thiscall Animal::speak(void)':没有定义纯虚函数</span><br></pre></td></tr></table></figure>
+<p>这告诉我们，只有当Cow为speak()提供了一个主体时，我们才能够实例化Cow。</p>
+<p>让我们继续：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Cow</span>:</span> <span class="keyword">public</span> Animal</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Cow(<span class="built_in">std</span>::<span class="built_in">string</span> name)</span><br><span class="line">        : Animal(name)</span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">const</span> <span class="keyword">char</span>* <span class="title">speak</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> <span class="string">"Moo"</span>; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">Cow <span class="title">cow</span><span class="params">(<span class="string">"Betsy"</span>)</span></span>;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; cow.getName() &lt;&lt; <span class="string">" says "</span> &lt;&lt; cow.speak() &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出结果：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Betsy says Moo</span><br></pre></td></tr></table></figure>
+
+<p>当我们想要将一个函数放入基类中，但只有派生类知道它应该返回什么时，纯虚函数是有用的。纯虚函数使基类无法实例化，派生类被迫在实例化这些函数之前定义它们。这有助于确保派生类不会忘记重新定义基类所期望的函数。</p>
+<h3 id="带有定义的纯虚函数-Pure-virtual-functions-with-bodies"><a href="#带有定义的纯虚函数-Pure-virtual-functions-with-bodies" class="headerlink" title="带有定义的纯虚函数 (Pure virtual functions with bodies)"></a>带有定义的纯虚函数 (Pure virtual functions with bodies)</h3><p>事实证明，我们可以定义具有定义的纯虚函数:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string&gt;</span></span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Animal</span> // <span class="title">This</span> <span class="title">Animal</span> <span class="title">is</span> <span class="title">an</span> <span class="title">abstract</span> <span class="title">base</span> <span class="title">class</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">string</span> m_name;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Animal(<span class="built_in">std</span>::<span class="built_in">string</span> name)</span><br><span class="line">        : m_name(name)</span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="built_in">std</span>::<span class="built_in">string</span> <span class="title">getName</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> m_name; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">const</span> <span class="keyword">char</span>* <span class="title">speak</span><span class="params">()</span> </span>= <span class="number">0</span>; <span class="comment">// The = 0 means this function is pure virtual</span></span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">const</span> <span class="keyword">char</span>* <span class="title">Animal::speak</span><span class="params">()</span>  <span class="comment">// even though it has a body</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">"buzz"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这种情况下，speak()仍然被认为是一个纯虚函数。尽管我们已经给了它一个定义，但是它的声明带有 “=0”。 Animal仍然被认为是一个抽象基类 (因此不能被实例化)。任何继承自Animal的类都需要为speak()提供自己的定义，否则也会被认为是一个抽象基类。</p>
+<p>当为纯虚函数提供定义时，必须另外单独提供 (而不是内联的) 。</p>
+<p>当您希望基类为函数提供默认实现，但仍然强制任何派生类提供它们自己的实现时，此范例非常有用。但是，如果派生类对基类提供的默认实现感到满意，它可以直接调用基类实现。例如:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Animal</span> // <span class="title">This</span> <span class="title">Animal</span> <span class="title">is</span> <span class="title">an</span> <span class="title">abstract</span> <span class="title">base</span> <span class="title">class</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">string</span> m_name;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Animal(<span class="built_in">std</span>::<span class="built_in">string</span> name)</span><br><span class="line">        : m_name(name)</span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="built_in">std</span>::<span class="built_in">string</span> <span class="title">getName</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> m_name; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">const</span> <span class="keyword">char</span>* <span class="title">speak</span><span class="params">()</span> </span>= <span class="number">0</span>; <span class="comment">// note that speak is a pure virtual function</span></span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">const</span> <span class="keyword">char</span>* <span class="title">Animal::speak</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">"buzz"</span>; <span class="comment">// some default implementation</span></span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dragonfly</span>:</span> <span class="keyword">public</span> Animal</span><br><span class="line">&#123;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Dragonfly(<span class="built_in">std</span>::<span class="built_in">string</span> name)</span><br><span class="line">        : Animal(name)</span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">const</span> <span class="keyword">char</span>* <span class="title">speak</span><span class="params">()</span> <span class="comment">// this class is no longer abstract because we defined this function</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> Animal::speak(); <span class="comment">// use Animal's default implementation</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">Dragonfly <span class="title">dfly</span><span class="params">(<span class="string">"Sally"</span>)</span></span>;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; dfly.getName() &lt;&lt; <span class="string">" says "</span> &lt;&lt; dfly.speak() &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上述输出结果：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Sally says buzz</span><br></pre></td></tr></table></figure>
+<p>不过这种功能并不常用。</p>
+<h2 id="接口类-Interface-clases"><a href="#接口类-Interface-clases" class="headerlink" title="接口类 (Interface clases)"></a>接口类 (Interface clases)</h2><p>接口类是一个没有成员变量的类，其中所有的函数都是纯虚的!换句话说，该类纯粹是一个定义，没有实际的实现。当您想定义派生类必须实现的功能，但将派生类如何实现该功能的细节完全留给派生类时，接口是有用的。</p>
+<p>接口类通常以”I”开头。下面是一个示例接口类:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">IErrorLog</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">bool</span> <span class="title">openLog</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *filename)</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">bool</span> <span class="title">closeLog</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">bool</span> <span class="title">writeError</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *errorMessage)</span> </span>= <span class="number">0</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">virtual</span> ~IErrorLog() &#123;&#125; <span class="comment">// make a virtual destructor in case we delete an IErrorLog pointer, so the proper derived destructor is called</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>从IErrorLog继承的任何类必须为所有三个函数提供实现，以便实例化。您可以派生一个名为FileErrorLog的类，其中openLog()打开磁盘上的文件，closeLog()关闭文件，writeError()将消息写入文件。您可以派生另一个名为ScreenErrorLog的类，其中openLog()和closeLog()什么都不做，writeError()在屏幕上的弹出消息框中打印消息。</p>
+<p>现在，假设您需要编写一些使用错误日志的代码。如果您编写的代码中直接包含了FileErrorLog或ScreenErrorLog，那么您实际上是在使用这种错误日志 (至少在不重新编写程序的情况下)。例如，下面的函数有效地迫使mySqrt()的调用者使用FileErrorLog，这可能是他们想要的，也可能不是。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cmath&gt; // for sqrt()</span></span></span><br><span class="line"><span class="function"><span class="keyword">double</span> <span class="title">mySqrt</span><span class="params">(<span class="keyword">double</span> value, FileErrorLog &amp;<span class="built_in">log</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (value &lt; <span class="number">0.0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">log</span>.writeError(<span class="string">"Tried to take square root of value less than 0"</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0.0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">sqrt</span>(value);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>实现这个函数的一个更好的方法是使用IErrorLog:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cmath&gt; // for sqrt()</span></span></span><br><span class="line"><span class="function"><span class="keyword">double</span> <span class="title">mySqrt</span><span class="params">(<span class="keyword">double</span> value, IErrorLog &amp;<span class="built_in">log</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (value &lt; <span class="number">0.0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">log</span>.writeError(<span class="string">"Tried to take square root of value less than 0"</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0.0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">sqrt</span>(value);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>现在，调用者可以传入任何符合IErrorLog接口的类。如果他们希望错误转移到文件中，他们可以传入FileErrorLog的实例。如果他们想让它显示在屏幕上，他们可以传入一个ScreenErrorLog实例。或者，如果他们想做一些您甚至没有想到的事情，比如在出现错误时向某人发送电子邮件，他们可以从IErrorLog (例如EmailErrorLog) 派生一个新类并使用它的一个实例!通过使用IErrorLog，您的函数变得更加独立和灵活。</p>
+<p>不要忘记为您的接口类包含一个虚析构函数，以便在删除指向接口的指针时调用适当的派生析构函数。</p>
+<p>接口类已经变得非常流行，因为它们易于使用、易于扩展和易于维护。事实上，一些现代语言，如Java和c#，已经添加了“interface”关键字，允许程序员直接定义接口类，而不必显式地将所有成员函数标记为抽象。此外，尽管Java (在版本8之前) 和c#不允许您在普通类上使用多重继承，但是它们允许您多重继承任意多的接口。因为接口没有数据和函数体，所以它们避免了很多传统的多重继承问题，同时仍然提供了很大的灵活性。</p>
+<h2 id="纯虚函数和虚表-Virtual-table"><a href="#纯虚函数和虚表-Virtual-table" class="headerlink" title="纯虚函数和虚表 (Virtual table)"></a>纯虚函数和虚表 (Virtual table)</h2><p>抽象类仍然有虚表，因为如果有指向抽象类的指针或引用，仍然可以使用虚表。纯虚函数的虚表条目通常要么包含一个空指针，要么指向一个泛型函数，如果没有被重写，这个泛型函数会输出一个错误 (有时这个函数被命名为_purecall) 。</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>sandyhsia</span>
+                    </p>
+                
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/cpp/"># cpp</a>
+                    
+                        <a href="/tags/virtual-function/"># virtual function</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/blog/2020/05/learncpp-cn-b6-new-virtual-func-control.html">B.6 - 新的虚函数控制：override, final, default, delete</a>
+            
+            
+            <a class="next" rel="next" href="/blog/2020/05/learncpp-cn-123-virtualization.html">12.3 - 虚的析构函数、虚的赋值和虚的覆盖</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© sandyhsia | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>
