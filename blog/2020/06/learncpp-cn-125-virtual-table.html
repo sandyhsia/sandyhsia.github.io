@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zn">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="sandyhsia">
+
+
+
+    <meta name="description" content="Code & Eat">
+
+
+
+<title>12.5 - 虚函数表 | Sober 0.1</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Sober 0.1</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Sober 0.1</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">12.5 - 虚函数表</h1>
+            
+                <div class="post-meta">
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">June 1, 2020&nbsp;&nbsp;21:54:18</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/learncpp-cn/">learncpp-cn</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <p>为了实现虚函数，c++使用了一种特殊的后期绑定形式，称为虚表。虚表是用于以动态 / 后期绑定方式解析函数调用的函数的查找表。虚表有时使用其他名称，如“vtable”、“virtual function table”、“virtual method table”或“dispatch table”。</p>
+<p>因为了解虚函数表的工作方式对于使用虚函数来说并不是必需的，所以这一节可以看作是可选的阅读。</p>
+<p>虚函数表实际上非常简单，虽然用文字描述有点复杂。首先，每个使用虚函数的类(或派生自使用虚函数的类)都有自己的虚函数表。这个表就是编译器在编译时设置的一个静态数组。虚函数表中的每一个条目包含着该类对象可以调用的每一个虚函数。这个表中的每个条目都是一个函数指针，指向该类可访问的派生程度最高(most-derived)的函数。</p>
+<p>其次，编译器还向基类添加了一个隐藏指针，我们将其称为*__vptr。在创建类实例时，*__vptr自动就被设置了，以便它指向该类的虚表。*this指针实际上是编译器用来解析自引用的一个函数参数，与*this指针不同，*__ vptr是一个真正的指针。因此，它的存在使分配的每个类对象的大小，都比应有的大小要多出一个指针的空间。这也意味着*__vptr是由派生类自动继承的，这一点很重要。</p>
+<p>到目前为止，你可能对这些东西是如何组合在一起的感到困惑，所以让我们看一个简单的例子:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">function1</span><span class="params">()</span> </span>&#123;&#125;;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">function2</span><span class="params">()</span> </span>&#123;&#125;;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">D1</span>:</span> <span class="keyword">public</span> Base</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">function1</span><span class="params">()</span> </span>&#123;&#125;;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">D2</span>:</span> <span class="keyword">public</span> Base</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">function2</span><span class="params">()</span> </span>&#123;&#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>因为这里有3个类，编译器将设置3个虚表: 一个用于基表，一个用于D1，一个用于D2。</p>
+<p>编译器还向使用虚函数的最基类添加一个隐藏指针。虽然编译器会自动这样做，我们会把它放在下一个例子，以显示它是在哪里添加的:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    FunctionPointer *__vptr;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">function1</span><span class="params">()</span> </span>&#123;&#125;;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">function2</span><span class="params">()</span> </span>&#123;&#125;;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">D1</span>:</span> <span class="keyword">public</span> Base</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">function1</span><span class="params">()</span> </span>&#123;&#125;;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">D2</span>:</span> <span class="keyword">public</span> Base</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">function2</span><span class="params">()</span> </span>&#123;&#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>当创建一个类对象时，*__ vptr被设置为指向该类的虚表。例如，当创建了一个Base类型的对象时，*__ vptr被设置为指向Base的虚表。当构造D1或D2类型的对象时，*__ vptr被设置为分别指向D1或D2的虚表。</p>
+<p>现在，让我们讨论一下这些虚拟表是如何被填上的。因为这里只有两个虚函数，每个虚表将有两个条目(一个用于function1()，另一个用于function2())。请记住，当这些虚表被填满时，每个条目都填满了该类类型的对象可以调用的派生程度最高的函数。</p>
+<p>基本对象的虚表很简单。Base类型的对象只能访问Base的成员。Base不能访问D1或D2函数。因此，function1的入口指向Base::function1()，而function2的入口指向Base::function2()。</p>
+<p>D1的虚表稍微复杂一些。类型D1的对象可以访问D1和Base的成员。但是，D1已经覆盖了function1()，使得D1::function1()比Base::function1()更派生 (more derived) 。因此，function1的条目指向D1::function1()。D1没有覆盖function2()，因此function2的条目将指向Base::function2()。</p>
+<p>D2的虚表类似于D1，除了function1的条目指向Base::function1()，而function2的条目指向D2::function2()。</p>
+<p>这是一张图表:<br><img src="/image/virtual-table.png" alt=""></p>
+<p>尽管这个图看起来有点疯狂，但它确实非常简单: 每个类中的*__ vptr指向该类的虚表。虚表中的条目指向该类的函数对象的派生程度最高的版本。</p>
+<p>考虑一下当我们创建一个D1类型的对象时会发生什么:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    D1 d1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>因为d1是D1对象，d1将它的*__vptr设置为D1的虚表。</p>
+<p>现在，让我们设置一个指向D1的Base指针:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    D1 d1;</span><br><span class="line">    Base *dPtr = &amp;d1;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意，因为dPtr是一个基指针，所以它只指向d1的基部分。但是，还要注意，*__ vptr位于类的基部分，因此dPtr可以访问这个指针。最后，请注意dPtr-&gt;__vptr指向D1虚表! 因此，即使dPtr的类型是Base，它仍然可以访问D1的虚表(通过__vptr)。</p>
+<p>那么，当我们尝试调用dPtr-&gt;function1()时会发生什么呢?</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    D1 d1;</span><br><span class="line">    Base *dPtr = &amp;d1;</span><br><span class="line">    dPtr-&gt;function1();</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>首先，程序认识到function1()是一个虚函数。其次，程序使用dPtr-&gt; vptr来访问D1的虚拟表。第三，查找function1()调用D1的虚表的版本。这已经设置为D1::function1()。因此，dPtr-&gt;function1()解析为D1::function1()!</p>
+<p>现在，您可能会说，“但是如果dPtr真的指向一个基对象而不是D1对象会怎么样呢?”它还会调用D1::function1()吗?”答案是否定的。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Base b;</span><br><span class="line">    Base *bPtr = &amp;b;</span><br><span class="line">    bPtr-&gt;function1();</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在本例中，当创建b时，vptr指向Base的虚表，而不是D1的虚表。因此，bPtr-&gt;__vptr也将指向Base的虚拟表。function1()的虚表条目指向Base::function1()。因此，bPtr-&gt;function1()解析为Base::function1()，这是派生程度最高的function1()版本，基对象应该能够调用它。</p>
+<p>通过使用这些表，编译器和程序能够确保函数调用解析到适当的虚函数，即使您只使用一个指针或对基类的引用!</p>
+<p>调用虚函数比调用非虚函数慢，原因如下: 首先，我们必须使用*__vptr来访问适当的虚表。其次，我们必须为虚表建立索引，以找到要调用的正确函数。只有这样我们才能调用这个函数。因此，我们必须执行3步操作才能找到要调用的函数，而不是对普通的间接函数调用时所执行的2步操作，或者对直接函数调用时所执行的1步操作。然而，对于现代计算机来说，这些额外的时间通常是微不足道的。</p>
+<p>同样需要提醒的是，任何使用虚函数的类都有一个 __vptr，因此该类的每个对象都将比应有的大小再大一个指针的空间。虚拟函数非常强大，但是它们也有性能代价。</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>sandyhsia</span>
+                    </p>
+                
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/cpp/"># cpp</a>
+                    
+                        <a href="/tags/virtual-function/"># virtual function</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/blog/2020/06/learncpp-cn-127-virtual-base-class.html">12.7 - 虚基类</a>
+            
+            
+            <a class="next" rel="next" href="/blog/2020/06/learncpp-cn-124-early-late-binding.html">12.4 - 早绑定和迟绑定</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© sandyhsia | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

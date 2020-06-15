@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zn">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="sandyhsia">
+
+
+
+    <meta name="description" content="Code & Eat">
+
+
+
+<title>12.7 - 虚基类 | Sober 0.1</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Sober 0.1</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Sober 0.1</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">12.7 - 虚基类</h1>
+            
+                <div class="post-meta">
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">June 1, 2020&nbsp;&nbsp;22:38:55</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/learncpp-cn/">learncpp-cn</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <p>在第十一课的最后一章——多重继承中，我们结束了对“钻石问题”的讨论。在本节中，我们将继续这个讨论。</p>
+<p>注意: 此部分是一个高级主题，如果需要可以跳过或略读。</p>
+<h2 id="钻石问题（The-diamond-problem）"><a href="#钻石问题（The-diamond-problem）" class="headerlink" title="钻石问题（The diamond problem）"></a>钻石问题（The diamond problem）</h2><p>下面是我们上一课的例子(带有一些构造函数)，说明了钻石问题:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PoweredDevice</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    PoweredDevice(<span class="keyword">int</span> power)</span><br><span class="line">    &#123;</span><br><span class="line">		<span class="built_in">cout</span> &lt;&lt; <span class="string">"PoweredDevice: "</span> &lt;&lt; power &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Scanner</span>:</span> <span class="keyword">public</span> PoweredDevice</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Scanner(<span class="keyword">int</span> scanner, <span class="keyword">int</span> power)</span><br><span class="line">        : PoweredDevice(power)</span><br><span class="line">    &#123;</span><br><span class="line">		<span class="built_in">cout</span> &lt;&lt; <span class="string">"Scanner: "</span> &lt;&lt; scanner &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Printer</span>:</span> <span class="keyword">public</span> PoweredDevice</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Printer(<span class="keyword">int</span> printer, <span class="keyword">int</span> power)</span><br><span class="line">        : PoweredDevice(power)</span><br><span class="line">    &#123;</span><br><span class="line">		<span class="built_in">cout</span> &lt;&lt; <span class="string">"Printer: "</span> &lt;&lt; printer &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Copier</span>:</span> <span class="keyword">public</span> Scanner, <span class="keyword">public</span> Printer</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Copier(<span class="keyword">int</span> scanner, <span class="keyword">int</span> printer, <span class="keyword">int</span> power)</span><br><span class="line">        : Scanner(scanner, power), Printer(printer, power)</span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>尽管你可能期望得到一个像这样的继承图:<br><img src="/image/virtual-base-0.png" alt=""></p>
+<p>如果您要创建一个copyier类对象，默认情况下您将得到PoweredDevice类的两个副本——一个来自Printer，一个来自Scanner。其结构如下:<br><img src="/image/virtual-base-1.png" alt=""></p>
+<p>我们可以创建一个简短的例子来演示它:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">Copier <span class="title">copier</span><span class="params">(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)</span></span>;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> 它将会输出以下结果：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">PoweredDevice: 3</span><br><span class="line">Scanner: 1</span><br><span class="line">PoweredDevice: 3</span><br><span class="line">Printer: 2</span><br></pre></td></tr></table></figure>
+
+<p>如您所见，PoweredDevice构造了两次。</p>
+<p>虽然这通常是需要的，但有时您可能希望扫描仪和打印机只共享PoweredDevice的一个副本。</p>
+<h2 id="虚拟基类-Virtual-base-classes"><a href="#虚拟基类-Virtual-base-classes" class="headerlink" title="虚拟基类 (Virtual base classes)"></a>虚拟基类 (Virtual base classes)</h2><p>要共享基类，只需在派生类的继承列表中插入“virtual”关键字。这将创建所谓的虚拟基类，这意味着只有一个基对象。基对象在继承树中的所有对象之间共享，并且只构造一次。下面是一个例子(为了简单起见没有构造函数)，展示了如何使用virtual关键字创建一个共享的基类:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PoweredDevice</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Scanner</span>:</span> <span class="keyword">virtual</span> <span class="keyword">public</span> PoweredDevice</span><br><span class="line">&#123;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Printer</span>:</span> <span class="keyword">virtual</span> <span class="keyword">public</span> PoweredDevice</span><br><span class="line">&#123;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Copier</span>:</span> <span class="keyword">public</span> Scanner, <span class="keyword">public</span> Printer</span><br><span class="line">&#123;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>现在，当您创建Copyier类对象时，您将在Copyier内只获得一个的PoweredDevice副本，该副本将由Scanner和Printer共享。</p>
+<p>但是，这又带来了一个问题: 如果Scanner和Printer共享一个PoweredDevice基类，那么谁负责创建它? 事实证明，答案是Copier。Copier构造函数负责创建PoweredDevice。因此，这是一次允许Copier直接调用非直接父类构造函数:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PoweredDevice</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    PoweredDevice(<span class="keyword">int</span> power)</span><br><span class="line">    &#123;</span><br><span class="line">		<span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"PoweredDevice: "</span> &lt;&lt; power &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Scanner</span>:</span> <span class="keyword">virtual</span> <span class="keyword">public</span> PoweredDevice <span class="comment">// note: PoweredDevice is now a virtual base class</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Scanner(<span class="keyword">int</span> scanner, <span class="keyword">int</span> power)</span><br><span class="line">        : PoweredDevice(power) <span class="comment">// this line is required to create Scanner objects, but ignored in this case</span></span><br><span class="line">    &#123;</span><br><span class="line">		<span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"Scanner: "</span> &lt;&lt; scanner &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Printer</span>:</span> <span class="keyword">virtual</span> <span class="keyword">public</span> PoweredDevice <span class="comment">// note: PoweredDevice is now a virtual base class</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Printer(<span class="keyword">int</span> printer, <span class="keyword">int</span> power)</span><br><span class="line">        : PoweredDevice(power) <span class="comment">// this line is required to create Printer objects, but ignored in this case</span></span><br><span class="line">    &#123;</span><br><span class="line">		<span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"Printer: "</span> &lt;&lt; printer &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Copier</span>:</span> <span class="keyword">public</span> Scanner, <span class="keyword">public</span> Printer</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Copier(<span class="keyword">int</span> scanner, <span class="keyword">int</span> printer, <span class="keyword">int</span> power)</span><br><span class="line">        : PoweredDevice(power), <span class="comment">// PoweredDevice is constructed here</span></span><br><span class="line">        Scanner(scanner, power), Printer(printer, power)</span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>这时上述例子中：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">Copier <span class="title">copier</span><span class="params">(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)</span></span>;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>会输出如下结果：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">PoweredDevice: 3</span><br><span class="line">Scanner: 1</span><br><span class="line">Printer: 2</span><br></pre></td></tr></table></figure>
+
+<p>如您所见，PoweredDevice只构造一次。</p>
+<p>有几个细节，如果我们不提，我们也许会疏忽。</p>
+<p>首先，虚拟基类总是在非虚拟基类之前创建，这确保了所有的基在它们的派生类之前创建。</p>
+<p>其次，请注意Scanner和Printer构造函数仍然调用PoweredDevice构造函数。当创建Copyier的实例时，这些构造函数调用将被忽略，因为Copyier负责创建PoweredDevice，而不是Scanner或Printer。但是，如果我们要创建Scanner或Printer的实例，将使用那些构造函数调用，并应用常规继承规则。</p>
+<p>第三，如果一个类继承了一个或多个具有虚拟父类的类，则派生最多的类负责构造虚拟基类。在本例中，Copier继承Printer和Scanner，这两个都有一个PoweredDevice虚拟基类。Copyier是派生最多的类，负责创建PoweredDevice。注意，即使在单一继承情况下也是如此: 如果Copier是从Printer单独继承的，而Printer实际上是从PoweredDevice继承的，那么Copier仍然负责创建PoweredDevice。</p>
+<p>第四，所有继承虚基类的类都将拥有一个虚表，即使它们通常没有虚表，也会因此增加一个指针。</p>
+<p>因为“Scanner”和“Printer”实际上派生自“PoweredDevice”，所以“Copier”将只是“PoweredDevice”的一个子对象。Scanner和Printer都需要知道如何找到单个PoweredDevice子对象，这样它们就可以访问它的成员 (因为毕竟它们是从它派生出来的)。这通常通过一些虚拟表魔术(实际上存储了从每个子类到PoweredDevice子对象的偏移量) 来完成。</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>sandyhsia</span>
+                    </p>
+                
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/cpp/"># cpp</a>
+                    
+                        <a href="/tags/virtual-function/"># virtual function</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/blog/2020/06/learncpp-cn-125-virtual-table.html">12.5 - 虚函数表</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© sandyhsia | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>
