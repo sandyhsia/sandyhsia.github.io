@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zn">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="sandyhsia">
+
+
+
+    <meta name="description" content="Code & Eat">
+
+
+
+<title>MMDetection 论文亮点 | Sober 0.1</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Sober 0.1</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Sober 0.1</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">MMDetection 论文亮点</h1>
+            
+                <div class="post-meta">
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">July 11, 2020&nbsp;&nbsp;11:06:10</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/mmdetection/">mmdetection</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h2 id="1-MMdetection-主要工作概要"><a href="#1-MMdetection-主要工作概要" class="headerlink" title="1. MMdetection 主要工作概要"></a>1. MMdetection 主要工作概要</h2><p>1） 模块化设计<br>2） 已经支持了很多深度学习网络结构，可以直接训练<br>3） 高效，主要体现在训练、推理速度高（与Detectron等框架进行了对比）<br>4） State of the art, MMDet队伍拿着这个工具箱拿下了COCO 2018目标检测的冠军</p>
+<h2 id="2-支持的网络结构"><a href="#2-支持的网络结构" class="headerlink" title="2. 支持的网络结构"></a>2. 支持的网络结构</h2><p>这一段比较清晰的，其实是对目标检测的框架和为人熟知的tricks做了一个梳理：</p>
+<h3 id="2-1-single-stage"><a href="#2-1-single-stage" class="headerlink" title="2.1 single-stage"></a>2.1 single-stage</h3><p>1) SSD:  a classic and widely used single-stage de-tector  with  simple  model  architecture,  proposed  in2015<br>2) RetinaNet:  a high-performance single-stage de-tector with Focal Loss, proposed in 2017<br>3) GHM: a gradient harmonizing mechanism to im-prove single-stage detectors, proposed in 2019<br>4) FCOS:  a fully convolutional anchor-free single-stage detector, proposed in 2019<br>5) FSAF: a feature selective anchor-free module forsingle-stage detectors, proposed in 2019.</p>
+<h3 id="2-2-two-stage"><a href="#2-2-two-stage" class="headerlink" title="2.2 two-stage"></a>2.2 two-stage</h3><p>1) Fast R-CNN:  a classic object detector  which re-quires pre-computed proposals, proposed in 2015.<br>2) Faster  R-CNN:  a  classic  and  widely  used  two-stage object detector which can be trained end-to-end,proposed in 2015<br>3) R-FCN:  a fully convolutional object detector withfaster speed than Faster R-CNN, proposed in 2016.<br>4) Mask R-CNN:  a classic and widely used objectdetection and instance segmentation method, proposedin 2017.<br>5) Grid R-CNN:  a grid guided localization mecha-nism as an alternative to bounding box regression, pro-posed in 2018.<br>6) Mask  Scoring  R-CNN:  an  improvement  overMask R-CNN by predicting the mask IoU, proposedin 2019.<br>7) Double-Head R-CNN:  different heads for classi-fication and localization, proposed in 2019</p>
+<h3 id="2-3-multi-stage"><a href="#2-3-multi-stage" class="headerlink" title="2.3 multi-stage"></a>2.3 multi-stage</h3><p>1) Cascade R-CNN: a powerful multi-stage object de-tection method, proposed in 2017<br>2) Hybrid Task Cascade:  a multi-stage multi-branchobject  detection  and  instance  segmentation  method,proposed in 2019</p>
+<h3 id="2-4-普遍骚操作总结-general-modules-and-methods"><a href="#2-4-普遍骚操作总结-general-modules-and-methods" class="headerlink" title="2.4 普遍骚操作总结 (general modules and methods)"></a>2.4 普遍骚操作总结 (general modules and methods)</h3><p>1) <strong>Mixed Precision Training 混合精度训练</strong>: train deep neural net-works using half precision floating point (FP16) num-bers, proposed in 2018.<br>2) Soft  NMS:   an  alternative  to  NMS,  proposed  in2017.<br>3) OHEM:  an  online  sampling  method  that  mineshard samples for training, proposed in 2016<br>4) DCN: deformable convolution and deformable RoIpooling, proposed in 2017.<br>5) DCNv2:  modulated  deformable  operators,  pro-posed in 2018.<br>6) Train from Scratch: training from random initialization  instead  of  ImageNet  pretraining,  proposed  in2018.<br>7) ScratchDet: another exploration on training fromscratch, proposed in 2018.<br>8) M2Det:  a new feature pyramid network to con-struct  more  effective  feature  pyramids,  proposed  in2018.<br>9) GCNet:  global  context  block  that  can  efficientlymodel the global context, proposed in 2019.<br>10) Generalized  Attention:   a  generalized  attentionformulation, proposed in 2019.<br>11) SyncBN: synchronized   batch   normalizationacross GPUs, we adopt the official implementation byPyTorch.<br>12) Group Normalization: a simple alternative to BN,proposed in 2018.<br>13) Weight   Standardization: standardizing   theweights  in  the  convolutional  layers  for  micro-batchtraining, proposed in 2019.<br>14) HRNet: a new backbone with a focus on learn-ing reliable high-resolution representations, proposedin 2019.<br>15) Guided Anchoring: a new anchoring scheme thatpredicts sparse and arbitrary-shaped anchors, proposedin 2019.<br>16) Libra  R-CNN:   a  new  framework  towards  bal-anced learning for object detection, proposed in 2019</p>
+<p>下图是一个mmdet与其在框架在其支持的网络数量上的对比：<br><img src="/image/mmdet-paper-table-1.png" alt=""></p>
+<h2 id="3-架构"><a href="#3-架构" class="headerlink" title="3. 架构"></a>3. 架构</h2><h3 id="3-1-对架构的抽象-model-representation"><a href="#3-1-对架构的抽象-model-representation" class="headerlink" title="3.1 对架构的抽象 (model representation)"></a>3.1 对架构的抽象 (model representation)</h3><p>1) Backbone: 从输入图片抽取feature map的结构<br>2) Neck: 对raw feature map进行初步操作的部分，一般用于连接backbone和head，如FPN<br>3) DenseHead (AnchoreHead / AnchorFreeHead): 直接作用于feature map的dense locations，如RPN-Head，RetinaHead， FCOSHead<br>4) RoIExtractor: 用于从单层、多层feature maps上对指定roi region抽取features的操作部件，操作会类似于RoIPooling<br>5) RoIHead (BBoxHead/MaskHead): 用于将RoI features作为输入，然后对每一个RoI内进行指定预测，如预测bbox和mask</p>
+<p>下图是一个目标检测方法用上述抽象模块的表示<br><img src="/image/mmdet-paper-figure-1.png" alt=""></p>
+<h3 id="3-2-训练流程的抽象"><a href="#3-2-训练流程的抽象" class="headerlink" title="3.2 训练流程的抽象"></a>3.2 训练流程的抽象</h3><p>mmdet设计了一个统一的训练流程与连接机制。许多任务的训练过程共享一个类似的工作流，其中training epoch和val epoch交替运行，同时val epoch是可选的。在每个epoch中有多次的向前和向后传播。为了使流程更加灵活和易于定制，mmdet定义了一个最简易版本的流程，它只是重复让模型前向传播。其他参数由连接机制定义。要运行自定义的training过程，可能需要在某些特定步骤之前或之后执行一些自定义的操作。mmdet定义了一些时间点，用户可以注册任何可执行的方法 (hooks) 。registered hook会在指定的时间点按照优先级触发。一个典型的training pipeline如下所示<br> <img src="/image/mmdet-paper-figure-2.png" alt=""></p>
+<h2 id="4-benchmarks"><a href="#4-benchmarks" class="headerlink" title="4. benchmarks"></a>4. benchmarks</h2><h3 id="4-1-实验设置"><a href="#4-1-实验设置" class="headerlink" title="4.1 实验设置"></a>4.1 实验设置</h3><p>1) 数据集格式支持COCO和VOC，并使用COCO2017作为评价指标<br>2) 1333 x 800为默认图片尺寸；8块V100 GPU train batchSize=16，1块V100来infer；1x, 2x为12 ep和24 ep，20e只在cascade model中使用，意思是20 epoch<br>3) 0.5～0.95 为multiple IoU设置，mAP用以衡量average recall.</p>
+<h3 id="4-2-结果"><a href="#4-2-结果" class="headerlink" title="4.2 结果"></a>4.2 结果</h3><p>1) 使用几种主流架构放在4种不同的backbone上来测时间和精度，如下图<br><img src="/image/mmdet-paper-figure-3.png" alt=""><br>2) 与其他的codebase进行了对比，主要是比较精度、速度、占用显存<br>3) 不同gpu下推理速度<br><img src="/image/mmdet-paper-table-23.png" alt=""><br>4) 混合精度训练不怎么掉点<br><img src="/image/mmdet-paper-table-4.png" alt=""><br>5) multi-node scalability，说明分布式训练支持比较好，可以获得接近线性的训练加速<br><img src="/image/mmdet-paper-figure-5.png" alt=""></p>
+<h2 id="5-其他的一些研究（这部分关于一些tricks的ablation-study我觉得挺好的）"><a href="#5-其他的一些研究（这部分关于一些tricks的ablation-study我觉得挺好的）" class="headerlink" title="5. 其他的一些研究（这部分关于一些tricks的ablation study我觉得挺好的）"></a>5. 其他的一些研究（这部分关于一些tricks的ablation study我觉得挺好的）</h2><h3 id="5-1-回归损失-regression-loss"><a href="#5-1-回归损失-regression-loss" class="headerlink" title="5.1 回归损失 (regression loss)"></a>5.1 回归损失 (regression loss)</h3><p><strong>boosting the gradients of better located bounding boxes will benefit the localization</strong>. (让回归的损失增大一些有利于学到预测更准的bbox)<br> <strong>The loss values of L1 loss are already quite large, therefore, increasing loss weight does notwork better.</strong>（但由于L1 loss在bbox上已经很大了，进一步增加这个loss的weight不会带来更多增益).  Balanced L1 Loss achieves 0.3% higher mAPthan L1 Loss for end-to-end Faster R-CNN, which is a little different from experiments that adopts precomputed proposals.<br><img src="/image/mmdet-paper-table-5.png" alt=""></p>
+<h3 id="5-2-归一化-normalization-layers"><a href="#5-2-归一化-normalization-layers" class="headerlink" title="5.2 归一化 (normalization layers)"></a>5.2 归一化 (normalization layers)</h3><p>1) 推荐BN settings:<br>i. eval=True (不更新mean和var), requires_grad=True (学习affine weights);<br>ii. when a <strong>longer lr schedule</strong> is adopted, making affine weights trainable outperforms fixing these weights by about0.5%<br><img src="/image/mmdet-paper-table-6.png" alt=""></p>
+<p>2) BN的种类(FrozenBN, SyncBN GN)和位置<br>Q1: How do different nor-malization layers compare with each other?<br>Q2: Where toadd normalization layers to detectors?<br><img src="/image/mmdet-paper-table-7.png" alt=""></p>
+<p>A1: FrozenBN,  SyncBNand  GN  achieve  similar  performance  if  we  just  replaceBN  layers  in  backbones  with  corresponding  ones. (BN换在backbone上没什么效果，加太早不好)<br>A2: Adding SyncBN or GN to FPN and bbox/mask head will not bring further gain.（BN换在head上没什么效果，加太晚也不好）<br>A3: Replacing the 2fcbbox head with4conv1fc as well as adding normalization layers to FPN and bbox/mask head improves the performance by around1.5%. （加在中间抽取对feature进行操作的部件上有效果）<br>A4: More convolution layers in bbox head will lead to higher performance. （在head上加conv层会有一些效果）</p>
+<h3 id="5-3-训练尺寸-training-scales"><a href="#5-3-训练尺寸-training-scales" class="headerlink" title="5.3 训练尺寸 (training scales)"></a>5.3 训练尺寸 (training scales)</h3><p>1) The “range” mode performs similarto or slightly better than the “value” mode with the same minimum  and  maximum  scales. (在随机尺寸时要做到range上的随机而不是少部分的有限值的随机)<br>2) Usually  a  wider  range brings more improvement, especially for larger maximum scales.  Specifically, [640 : 960] is 0.4% and 0.5% higher than[640 : 800] in terms of bbox and mask AP. (更宽的range会有增益)<br>3) However, a smaller minimum scale like 480 will not achieve better performance.（减小图片尺度没有明显效果）<br><img src="/image/mmdet-paper-table-8.png" alt=""></p>
+<h3 id="5-4-其他超参"><a href="#5-4-其他超参" class="headerlink" title="5.4 其他超参"></a>5.4 其他超参</h3><p><img src="/image/mmdet-paper-table-9.png" alt=""></p>
+<h4 id="5-4-1-smoothl1-beta"><a href="#5-4-1-smoothl1-beta" class="headerlink" title="5.4.1 smoothl1_beta"></a>5.4.1 smoothl1_beta</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">torch.where(x &lt;=  beta, <span class="number">0.5</span> * x^<span class="number">2</span> / beta, x − <span class="number">0.5</span> * beta)</span><br></pre></td></tr></table></figure>
+
+<p>这个参数越小，使得smooth l1 loss更接近于l1 loss, 在total loss上贡献更大，使得bbox train得更好.</p>
+<h4 id="5-4-2-allowed-border"><a href="#5-4-2-allowed-border" class="headerlink" title="5.4.2 allowed_border"></a>5.4.2 allowed_border</h4><p>In RPN, pre-defined anchors are generatedon each location of a feature map.  Anchors exceeding the boundaries of the image by more than allowed_border will be ignored during training.  It is set to 0 by default, which means any anchors exceeding the image boundary will beignored.  However,  we find that relaxing this rule will be beneficial.  If we set it to infinity, which means none of the anchors are ignored, AR will be improved from 57.1% to 57.7%.  In this way, ground truth objects near boundaries will have more matching positive samples during training. (如果让超过图片边界的anchor不被忽略而参与训练，对靠近图片边界的物体应该会预测得更好)</p>
+<h4 id="5-4-3-neg-pos-ub-upperbound"><a href="#5-4-3-neg-pos-ub-upperbound" class="headerlink" title="5.4.3 neg_pos_ub (upperbound)"></a>5.4.3 neg_pos_ub (upperbound)</h4><p>We add this new hyper-parameter for samplingp ositive  and  negative  anchors.  When  training  the  RPN, in the case when insufficient positive anchors are present,one  typically  samples  more  negative  samples  to  guaran-tee a fixed number of training samples.   Here we explore neg_pos_ub to control the upper bound of the ratio of negative samples to positive samples.  Setting neg_pos_ub to infinity leads to the aforementioned sampling behavior.  This default  practice will  sometimes cause  imbalance  distribution in negative and positive samples. By setting it to a rea-sonable value,e.g., 3 or 5, which means we sample negative samples at most 3 or 5 times of positive ones, a gain of 1.2% or 1.1% is observed.（设置一个超参直接控制生成的neg anchors的最大数量为pos anchor数量乘上一个上限，约为3～5，也会有效果）</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>sandyhsia</span>
+                    </p>
+                
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/deeplearning/"># deeplearning</a>
+                    
+                        <a href="/tags/framework/"># framework</a>
+                    
+                        <a href="/tags/mmdetection/"># mmdetection</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/blog/2020/06/learncpp-cn-127-virtual-base-class.html">12.7 - 虚基类</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© sandyhsia | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>
