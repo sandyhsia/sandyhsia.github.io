@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>CornerNet 论文阅读</title>
+      <link href="//blog/2020/07/cornerNet-paper.html"/>
+      <url>//blog/2020/07/cornerNet-paper.html</url>
+      
+        <content type="html"><![CDATA[<h2 id="CornerNet-Detecting-Objects-as-Paired-Keypoints"><a href="#CornerNet-Detecting-Objects-as-Paired-Keypoints" class="headerlink" title="CornerNet: Detecting Objects as Paired Keypoints"></a>CornerNet: Detecting Objects as Paired Keypoints</h2><p>Abstract. We propose CornerNet, a new approach to object detectionwhere we detect an object bounding box as a pair of keypoints, thetop-left corner and the bottom-right corner, using a single convolutionneural network. By detecting objects as paired keypoints, we eliminatethe need for designing a set of anchor boxes commonly used in priorsingle-stage detectors. In addition to our novel formulation,we introducecorner pooling, a new type of pooling layer that helps the network betterlocalize corners. Experiments show that CornerNet achieves a 42.1% APon MS COCO, outperforming all existing one-stage detectors.</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> Git </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> deeplearning </tag>
+            
+            <tag> objectdetection </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>MMDetection 论文亮点</title>
       <link href="//blog/2020/07/mmdetection-paper.html"/>
       <url>//blog/2020/07/mmdetection-paper.html</url>
